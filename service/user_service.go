@@ -15,7 +15,7 @@ import (
 )
 
 var (
-	ErrInvalidLoginDetails = errors.E(errors.Invalid, "invalid login details")
+	ErrInvalidLoginDetails = errors.E(errors.Unauthorized, "invalid login details")
 	ErrEmailAlreadyExists  = errors.E(errors.Invalid, "email already exists")
 	ErrUserNotFound        = errors.E(errors.NotFound, "user not found")
 )
@@ -32,7 +32,7 @@ func NewUserService(querier sqlgen.Querier) *UserService {
 	return &UserService{querier: querier}
 }
 
-func (s *UserService) CreateUser(ctx context.Context, p rankit.CreateUserParm) (*rankit.User, error) {
+func (s *UserService) CreateUser(ctx context.Context, p rankit.CreateUserParam) (*rankit.User, error) {
 	hash, err := bcrypt.GenerateFromPassword([]byte(p.Password), BCRYPT_COST)
 	if err != nil {
 		return nil, fmt.Errorf("failed to hash password: %w", err)

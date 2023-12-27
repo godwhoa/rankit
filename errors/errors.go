@@ -31,11 +31,12 @@ type Kind uint8
 
 // Transport agnostic error "kinds"
 const (
-	Other    Kind = iota // Unclassified error
-	Internal             // Internal error
-	Conflict             // Conflict when an entity already exists
-	Invalid              // Invalid input, validation error etc
-	NotFound             // Entity does not exist
+	Other        Kind = iota // Unclassified error
+	Internal                 // Internal error
+	Conflict                 // Conflict when an entity already exists
+	Invalid                  // Invalid input, validation error etc
+	NotFound                 // Entity does not exist
+	Unauthorized             // Unauthorized access
 )
 
 func (k Kind) String() string {
