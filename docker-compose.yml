@@ -1,0 +1,13 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:16
+    restart: always
+    environment:
+      POSTGRES_USER: rankit
+      POSTGRES_PASSWORD: rankit
+      POSTGRES_DB: rankit
+    volumes:
+      - ./docker:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
