@@ -8,20 +8,21 @@ import (
 	"github.com/jackc/pgerrcode"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-func Connect(URI string) (*pgx.Conn, error) {
-	conn, err := pgx.Connect(context.Background(), URI)
+func Connect(URI string) (*pgxpool.Pool, error) {
+	pool, err := pgxpool.New(context.Background(), URI)
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to database: %w", err)
 	}
 
-	err = conn.Ping(context.Background())
+	err = pool.Ping(context.Background())
 	if err != nil {
 		return nil, fmt.Errorf("failed to ping database: %w", err)
 	}
 
-	return conn, nil
+	return pool, nil
 }
 
 func IsUniqueViolation(err error) (*pgconn.PgError, bool) {
