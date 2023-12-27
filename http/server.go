@@ -10,6 +10,8 @@ import (
 	"github.com/alexedwards/scs/v2"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/go-playground/validator/v10"
+	"github.com/samber/lo"
 	"go.uber.org/zap"
 	"moul.io/chizap"
 )
@@ -89,6 +91,17 @@ func RespondError(w http.ResponseWriter, err *errors.Error) {
 	case errors.NotFound:
 		RespondMessage(w, http.StatusNotFound, err.Message)
 	case errors.Invalid:
+		var validationErrs validator.ValidationErrors
+		if errors.As(err, &validationErrs) {
+			errStrings := lo.Map(validationErrs, func(fe validator.FieldError, _ int) string {
+				return fe.Error()
+			})
+			RespondJSON(w, http.StatusBadRequest, map[string]any{
+				"message": err.Message,
+				"errors":  errStrings,
+			})
+			return
+		}
 		RespondMessage(w, http.StatusBadRequest, err.Message)
 	case errors.Unauthorized:
 		RespondMessage(w, http.StatusUnauthorized, err.Message)

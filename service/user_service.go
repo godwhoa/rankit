@@ -9,6 +9,7 @@ import (
 	"rankit/postgres/sqlgen"
 	"rankit/rankit"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/jackc/pgx/v5"
 	"github.com/segmentio/ksuid"
 	"golang.org/x/crypto/bcrypt"
@@ -23,16 +24,24 @@ var (
 const BCRYPT_COST = bcrypt.DefaultCost + 4
 
 type UserService struct {
-	querier sqlgen.Querier
+	querier  sqlgen.Querier
+	validate *validator.Validate
 }
 
 var _ rankit.UserService = (*UserService)(nil)
 
 func NewUserService(querier sqlgen.Querier) *UserService {
-	return &UserService{querier: querier}
+	return &UserService{
+		querier:  querier,
+		validate: validator.New(),
+	}
 }
 
 func (s *UserService) CreateUser(ctx context.Context, p rankit.CreateUserParam) (*rankit.User, error) {
+	if err := s.validate.Struct(p); err != nil {
+		return nil, errors.E(errors.Invalid, "validation failed", err)
+	}
+
 	hash, err := bcrypt.GenerateFromPassword([]byte(p.Password), BCRYPT_COST)
 	if err != nil {
 		return nil, fmt.Errorf("failed to hash password: %w", err)
@@ -54,8 +63,12 @@ func (s *UserService) CreateUser(ctx context.Context, p rankit.CreateUserParam) 
 	return toRankitUser(user), nil
 }
 
-func (s *UserService) Authenticate(ctx context.Context, email, password string) (*rankit.User, error) {
-	user, err := s.querier.GetUserByEmail(ctx, email)
+func (s *UserService) Authenticate(ctx context.Context, p rankit.AuthenticateUserParam) (*rankit.User, error) {
+	if err := s.validate.Struct(p); err != nil {
+		return nil, errors.E(errors.Invalid, "validation failed", err)
+	}
+
+	user, err := s.querier.GetUserByEmail(ctx, p.Email)
 	if err == pgx.ErrNoRows {
 		return nil, ErrInvalidLoginDetails
 	}
@@ -63,7 +76,7 @@ func (s *UserService) Authenticate(ctx context.Context, email, password string) 
 		return nil, fmt.Errorf("failed to get user by email: %w", err)
 	}
 
-	isValid := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(password)) == nil
+	isValid := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(p.Password)) == nil
 	if !isValid {
 		return nil, ErrInvalidLoginDetails
 	}
