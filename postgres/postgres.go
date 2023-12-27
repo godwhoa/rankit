@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"rankit/postgres/sqlgen"
 
 	"github.com/jackc/pgerrcode"
 	"github.com/jackc/pgx/v5"
@@ -23,6 +24,10 @@ func Connect(URI string) (*pgxpool.Pool, error) {
 	}
 
 	return pool, nil
+}
+
+func NewQuerier(pool *pgxpool.Pool) *sqlgen.Queries {
+	return sqlgen.New(pool)
 }
 
 func IsUniqueViolation(err error) (*pgconn.PgError, bool) {
