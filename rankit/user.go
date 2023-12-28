@@ -5,14 +5,14 @@ import (
 )
 
 type CreateUserParam struct {
-	Email       string `json:"email" validate:"required,email"`
-	DisplayName string `json:"display_name" validate:"required"`
-	Password    string `json:"password" validate:"required,min=8"`
+	Email       string `json:"email"`
+	DisplayName string `json:"display_name"`
+	Password    string `json:"password"`
 }
 
 type AuthenticateUserParam struct {
-	Email    string `json:"email" validate:"required,email"`
-	Password string `json:"password" validate:"required,min=8"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
 }
 
 type User struct {

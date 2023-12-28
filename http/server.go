@@ -10,8 +10,6 @@ import (
 	"github.com/alexedwards/scs/v2"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
-	"github.com/go-playground/validator/v10"
-	"github.com/samber/lo"
 	"go.uber.org/zap"
 	"moul.io/chizap"
 )
@@ -45,11 +43,11 @@ func (s *Server) Listen(addr string) error {
 		WithReferer:   false,
 		WithUserAgent: false,
 	}))
-	r.Route("/v1/user", func(r chi.Router) {
+	r.Route("/v1/users", func(r chi.Router) {
 		r.Post("/", s.toHTTPHandlerFunc(s.CreateUser))
 		r.Post("/authenticate", s.toHTTPHandlerFunc(s.AuthenticateUser))
 	})
-	return http.ListenAndServe(addr, r)
+	return http.ListenAndServe(addr, s.sessionmgr.LoadAndSave(r))
 }
 
 func (s *Server) toHTTPHandlerFunc(handler func(w http.ResponseWriter, r *http.Request) (any, int, error)) http.HandlerFunc {
@@ -91,14 +89,11 @@ func RespondError(w http.ResponseWriter, err *errors.Error) {
 	case errors.NotFound:
 		RespondMessage(w, http.StatusNotFound, err.Message)
 	case errors.Invalid:
-		var validationErrs validator.ValidationErrors
-		if errors.As(err, &validationErrs) {
-			errStrings := lo.Map(validationErrs, func(fe validator.FieldError, _ int) string {
-				return fe.Error()
-			})
+		var ve *errors.ValidationErrors
+		if errors.As(err, &ve) {
 			RespondJSON(w, http.StatusBadRequest, map[string]any{
-				"message": err.Message,
-				"errors":  errStrings,
+				"message":           err.Message,
+				"validation_errors": ve,
 			})
 			return
 		}

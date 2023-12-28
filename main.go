@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	logger, _ := zap.NewProduction()
+	logger, _ := zap.NewDevelopment()
 	defer logger.Sync()
 
 	db, err := postgres.Connect("postgres://rankit:rankit@localhost:5432/rankit")

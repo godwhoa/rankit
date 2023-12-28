@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+
 	"rankit/postgres/sqlgen"
 
 	"github.com/jackc/pgerrcode"

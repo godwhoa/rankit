@@ -26,6 +26,11 @@ func (e *Error) Error() string {
 	return buf.String()
 }
 
+// Unwrap returns the wrapped error.
+func (e *Error) Unwrap() error {
+	return e.WrappedErr
+}
+
 // Kind defines the kind or class of an error.
 type Kind uint8
 
@@ -96,3 +101,25 @@ var (
 	As = errors.As
 	Is = errors.Is
 )
+
+type FieldError struct {
+	Field string `json:"field"`
+	Error string `json:"error"`
+}
+
+type ValidationErrors []FieldError
+
+func (v *ValidationErrors) Add(field, err string) {
+	*v = append(*v, FieldError{field, err})
+}
+
+func (v *ValidationErrors) AsErr() error {
+	if v == nil || len(*v) == 0 {
+		return nil
+	}
+	return v
+}
+
+func (v ValidationErrors) Error() string {
+	return "validation failed"
+}
