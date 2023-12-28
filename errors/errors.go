@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	"strings"
 )
 
 // Error defines a standard application error.
@@ -80,46 +79,7 @@ func E(args ...interface{}) error {
 	return e
 }
 
-type MultiErr []error
-
-func (m MultiErr) Error() string {
-	msg := &strings.Builder{}
-	msg.WriteRune('[')
-	for i, err := range m {
-		if i > 0 {
-			msg.WriteRune(',')
-		}
-		msg.WriteRune('"')
-		msg.WriteString(err.Error())
-		msg.WriteRune('"')
-	}
-	msg.WriteRune(']')
-	return msg.String()
-}
-
 var (
 	As = errors.As
 	Is = errors.Is
 )
-
-type FieldError struct {
-	Field string `json:"field"`
-	Error string `json:"error"`
-}
-
-type ValidationErrors []FieldError
-
-func (v *ValidationErrors) Add(field, err string) {
-	*v = append(*v, FieldError{field, err})
-}
-
-func (v *ValidationErrors) AsErr() error {
-	if v == nil || len(*v) == 0 {
-		return nil
-	}
-	return v
-}
-
-func (v ValidationErrors) Error() string {
-	return "validation failed"
-}
