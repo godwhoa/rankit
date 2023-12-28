@@ -4,8 +4,10 @@ import (
 	"math"
 )
 
-const DEFAULT_ELO_RATING = 1000
-const kFactor = 32
+const (
+	DEFAULT_ELO_RATING = 1000
+	kFactor            = 32
+)
 
 // CalculateElo calculates the new elo ratings for the winner and loser
 func CalculateElo(winnerRating, loserRating int) (int, int) {

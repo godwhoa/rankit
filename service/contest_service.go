@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
+
 	"rankit/errors"
 	"rankit/postgres"
 	"rankit/postgres/sqlgen"
