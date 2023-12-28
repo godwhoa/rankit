@@ -18,20 +18,20 @@ import (
 
 type Server struct {
 	usersvc    rankit.UserService
-	contentsvc rankit.ContestService
+	contestsvc rankit.ContestService
 	sessionmgr *scs.SessionManager
 	logger     *zap.Logger
 }
 
 func NewServer(
 	usersvc rankit.UserService,
-	contentsvc rankit.ContestService,
+	contestsvc rankit.ContestService,
 	sessionmgr *scs.SessionManager,
 	logger *zap.Logger,
 ) *Server {
 	return &Server{
 		usersvc:    usersvc,
-		contentsvc: contentsvc,
+		contestsvc: contestsvc,
 		sessionmgr: sessionmgr,
 		logger:     logger,
 	}
