@@ -16,7 +16,7 @@ func (s *Server) CreateUser(w http.ResponseWriter, r *http.Request) (response an
 
 	user, err := s.usersvc.CreateUser(r.Context(), p)
 	if err == nil {
-		s.sessionmgr.Put(r.Context(), "user_id", user.ID)
+		s.sessionmgr.Put(r.Context(), USER_ID_SESSION_KEY, user.ID)
 		return user, http.StatusCreated, nil
 	}
 
@@ -31,7 +31,7 @@ func (s *Server) AuthenticateUser(w http.ResponseWriter, r *http.Request) (respo
 
 	user, err := s.usersvc.Authenticate(r.Context(), p)
 	if err == nil {
-		s.sessionmgr.Put(r.Context(), "user_id", user.ID)
+		s.sessionmgr.Put(r.Context(), USER_ID_SESSION_KEY, user.ID)
 		return user, http.StatusOK, nil
 	}
 
