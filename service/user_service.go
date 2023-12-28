@@ -9,7 +9,6 @@ import (
 	"rankit/postgres/sqlgen"
 	"rankit/rankit"
 
-	"github.com/go-playground/validator/v10"
 	"github.com/jackc/pgx/v5"
 	"github.com/segmentio/ksuid"
 	"golang.org/x/crypto/bcrypt"
@@ -24,16 +23,14 @@ var (
 const BCRYPT_COST = bcrypt.DefaultCost + 4
 
 type UserService struct {
-	querier  sqlgen.Querier
-	validate *validator.Validate
+	querier sqlgen.Querier
 }
 
 var _ rankit.UserService = (*UserService)(nil)
 
 func NewUserService(querier sqlgen.Querier) *UserService {
 	return &UserService{
-		querier:  querier,
-		validate: validator.New(),
+		querier: querier,
 	}
 }
 
