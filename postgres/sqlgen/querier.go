@@ -10,15 +10,19 @@ import (
 
 type Querier interface {
 	// Create a new contest
-	CreateContest(ctx context.Context, arg CreateContestParams) error
+	CreateContest(ctx context.Context, arg CreateContestParams) (*Contest, error)
 	// Create a new item
-	CreateItem(ctx context.Context, arg CreateItemParams) error
+	CreateItem(ctx context.Context, arg CreateItemParams) (*Item, error)
 	// Create a new user
 	CreateUser(ctx context.Context, arg CreateUserParams) (*User, error)
+	// Find contest by ID
+	GetContestByID(ctx context.Context, id string) (*Contest, error)
 	// Get item ELO rating history
 	GetItemEloHistory(ctx context.Context, itemID string) ([]*EloHistory, error)
 	// Get an item's current ELO rating
 	GetItemEloRating(ctx context.Context, id string) (int, error)
+	// Find items by contest ID
+	GetItemsByContestID(ctx context.Context, contestID string) ([]*Item, error)
 	// Get random items for a contest
 	GetRandomItems(ctx context.Context, arg GetRandomItemsParams) ([]*Item, error)
 	// Find a user by email

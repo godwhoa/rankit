@@ -15,20 +15,28 @@ INSERT INTO users (
 ) RETURNING *;
 
 -- Create a new contest
--- name: CreateContest :exec
+-- name: CreateContest :one
 INSERT INTO contests (
     id, creator_id, title, description, created_at, updated_at
 ) VALUES (
     $1, $2, $3, $4, CURRENT_TIMESTAMP AT TIME ZONE 'UTC', CURRENT_TIMESTAMP AT TIME ZONE 'UTC'
-);
+) RETURNING *;
+
+-- Find contest by ID
+-- name: GetContestByID :one
+SELECT * FROM contests WHERE id = $1;
 
 -- Create a new item
--- name: CreateItem :exec
+-- name: CreateItem :one
 INSERT INTO items (
     id, contest_id, content_type, content, elo_rating, created_at, updated_at
 ) VALUES (
     $1, $2, $3, $4, $5, CURRENT_TIMESTAMP AT TIME ZONE 'UTC', CURRENT_TIMESTAMP AT TIME ZONE 'UTC'
-);
+) RETURNING *;
+
+-- Find items by contest ID
+-- name: GetItemsByContestID :many
+SELECT * FROM items WHERE contest_id = $1;
 
 -- Get an item's current ELO rating
 -- name: GetItemEloRating :one

@@ -13,7 +13,8 @@ CREATE TABLE contests (
     id TEXT PRIMARY KEY,
     creator_id TEXT NOT NULL,
     title TEXT NOT NULL,
-    description TEXT,
+    description TEXT NOT NULL,
+    content_type TEXT NOT NULL, -- v1/markdown, v1/image, v1/video, v1/audio, v1/link
     created_at TIMESTAMPTZ NOT NULL,
     updated_at TIMESTAMPTZ NOT NULL,
     FOREIGN KEY (creator_id) REFERENCES users(id)

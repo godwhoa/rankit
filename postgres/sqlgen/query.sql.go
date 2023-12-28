@@ -10,38 +10,48 @@ import (
 	"encoding/json"
 )
 
-const createContest = `-- name: CreateContest :exec
+const createContest = `-- name: CreateContest :one
 INSERT INTO contests (
     id, creator_id, title, description, created_at, updated_at
 ) VALUES (
     $1, $2, $3, $4, CURRENT_TIMESTAMP AT TIME ZONE 'UTC', CURRENT_TIMESTAMP AT TIME ZONE 'UTC'
-)
+) RETURNING id, creator_id, title, description, content_type, created_at, updated_at
 `
 
 type CreateContestParams struct {
-	ID          string  `json:"id"`
-	CreatorID   string  `json:"creator_id"`
-	Title       string  `json:"title"`
-	Description *string `json:"description"`
+	ID          string `json:"id"`
+	CreatorID   string `json:"creator_id"`
+	Title       string `json:"title"`
+	Description string `json:"description"`
 }
 
 // Create a new contest
-func (q *Queries) CreateContest(ctx context.Context, arg CreateContestParams) error {
-	_, err := q.db.Exec(ctx, createContest,
+func (q *Queries) CreateContest(ctx context.Context, arg CreateContestParams) (*Contest, error) {
+	row := q.db.QueryRow(ctx, createContest,
 		arg.ID,
 		arg.CreatorID,
 		arg.Title,
 		arg.Description,
 	)
-	return err
+	var i Contest
+	err := row.Scan(
+		&i.ID,
+		&i.CreatorID,
+		&i.Title,
+		&i.Description,
+		&i.ContentType,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return &i, err
 }
 
-const createItem = `-- name: CreateItem :exec
+const createItem = `-- name: CreateItem :one
 INSERT INTO items (
     id, contest_id, content_type, content, elo_rating, created_at, updated_at
 ) VALUES (
     $1, $2, $3, $4, $5, CURRENT_TIMESTAMP AT TIME ZONE 'UTC', CURRENT_TIMESTAMP AT TIME ZONE 'UTC'
-)
+) RETURNING id, contest_id, content_type, content, elo_rating, created_at, updated_at
 `
 
 type CreateItemParams struct {
@@ -53,15 +63,25 @@ type CreateItemParams struct {
 }
 
 // Create a new item
-func (q *Queries) CreateItem(ctx context.Context, arg CreateItemParams) error {
-	_, err := q.db.Exec(ctx, createItem,
+func (q *Queries) CreateItem(ctx context.Context, arg CreateItemParams) (*Item, error) {
+	row := q.db.QueryRow(ctx, createItem,
 		arg.ID,
 		arg.ContestID,
 		arg.ContentType,
 		arg.Content,
 		arg.EloRating,
 	)
-	return err
+	var i Item
+	err := row.Scan(
+		&i.ID,
+		&i.ContestID,
+		&i.ContentType,
+		&i.Content,
+		&i.EloRating,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return &i, err
 }
 
 const createUser = `-- name: CreateUser :one
@@ -93,6 +113,26 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (*User, 
 		&i.DisplayName,
 		&i.Email,
 		&i.PasswordHash,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return &i, err
+}
+
+const getContestByID = `-- name: GetContestByID :one
+SELECT id, creator_id, title, description, content_type, created_at, updated_at FROM contests WHERE id = $1
+`
+
+// Find contest by ID
+func (q *Queries) GetContestByID(ctx context.Context, id string) (*Contest, error) {
+	row := q.db.QueryRow(ctx, getContestByID, id)
+	var i Contest
+	err := row.Scan(
+		&i.ID,
+		&i.CreatorID,
+		&i.Title,
+		&i.Description,
+		&i.ContentType,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -139,6 +179,39 @@ func (q *Queries) GetItemEloRating(ctx context.Context, id string) (int, error) 
 	var elo_rating int
 	err := row.Scan(&elo_rating)
 	return elo_rating, err
+}
+
+const getItemsByContestID = `-- name: GetItemsByContestID :many
+SELECT id, contest_id, content_type, content, elo_rating, created_at, updated_at FROM items WHERE contest_id = $1
+`
+
+// Find items by contest ID
+func (q *Queries) GetItemsByContestID(ctx context.Context, contestID string) ([]*Item, error) {
+	rows, err := q.db.Query(ctx, getItemsByContestID, contestID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*Item
+	for rows.Next() {
+		var i Item
+		if err := rows.Scan(
+			&i.ID,
+			&i.ContestID,
+			&i.ContentType,
+			&i.Content,
+			&i.EloRating,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const getRandomItems = `-- name: GetRandomItems :many
