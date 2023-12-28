@@ -89,7 +89,7 @@ func RespondError(w http.ResponseWriter, err *errors.Error) {
 	case errors.NotFound:
 		RespondMessage(w, http.StatusNotFound, err.Message)
 	case errors.Invalid:
-		var ve *errors.ValidationErrors
+		var ve errors.ValidationErrors
 		if errors.As(err, &ve) {
 			RespondJSON(w, http.StatusBadRequest, map[string]any{
 				"message":           err.Message,

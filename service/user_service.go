@@ -38,7 +38,7 @@ func NewUserService(querier sqlgen.Querier) *UserService {
 }
 
 func validateCreateUserParam(p rankit.CreateUserParam) error {
-	var ve errors.ValidationErrors
+	ve := errors.ValidationErrs()
 
 	if p.DisplayName == "" {
 		ve.Add("display_name", "cannot be empty")
@@ -53,7 +53,7 @@ func validateCreateUserParam(p rankit.CreateUserParam) error {
 		ve.Add("password", "must be at least 8 characters")
 	}
 
-	return ve.AsErr()
+	return ve.Err()
 }
 
 func (s *UserService) CreateUser(ctx context.Context, p rankit.CreateUserParam) (*rankit.User, error) {
@@ -83,7 +83,7 @@ func (s *UserService) CreateUser(ctx context.Context, p rankit.CreateUserParam) 
 }
 
 func validateAuthenticateUserParam(p rankit.AuthenticateUserParam) error {
-	ve := new(errors.ValidationErrors)
+	ve := errors.ValidationErrs()
 
 	if p.Email == "" {
 		ve.Add("email", "cannot be empty")
@@ -92,7 +92,7 @@ func validateAuthenticateUserParam(p rankit.AuthenticateUserParam) error {
 		ve.Add("password", "cannot be empty")
 	}
 
-	return ve.AsErr()
+	return ve.Err()
 }
 
 func (s *UserService) Authenticate(ctx context.Context, p rankit.AuthenticateUserParam) (*rankit.User, error) {
