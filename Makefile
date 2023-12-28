@@ -6,6 +6,7 @@ GOBIN := $(shell go env GOPATH)/bin
 setup:
 	go install github.com/sqlc-dev/sqlc/cmd/sqlc@v1.24.0
 	go install mvdan.cc/gofumpt@latest
+	go install github.com/cosmtrek/air@latest
 	brew install ariga/tap/atlas
 
 generate: generate-sql
@@ -24,4 +25,4 @@ fmt:
 	gofumpt -w -l .
 
 watch:
-	watch -n 3 make generate
+	air
