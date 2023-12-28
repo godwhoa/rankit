@@ -37,3 +37,9 @@ func (s *Server) AuthenticateUser(w http.ResponseWriter, r *http.Request) (respo
 
 	return
 }
+
+func (s *Server) Logout(w http.ResponseWriter, r *http.Request) (response any, status int, err error) {
+	s.sessionmgr.Remove(r.Context(), USER_ID_SESSION_KEY)
+	RespondMessage(w, http.StatusOK, "logged out")
+	return
+}

@@ -46,7 +46,7 @@ func (s *Server) Listen(addr string) error {
 	r.Route("/v1/users", func(r chi.Router) {
 		r.Post("/", s.toHTTPHandlerFunc(s.CreateUser))
 		r.Post("/login", s.toHTTPHandlerFunc(s.AuthenticateUser))
-		// r.Post("/logout", s.toHTTPHandlerFunc(s.Logout))
+		r.Post("/logout", s.toHTTPHandlerFunc(s.Logout))
 	})
 	r.Route("/v1/contests", func(r chi.Router) {
 		r.Use(Auth(s.sessionmgr))
