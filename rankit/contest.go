@@ -63,9 +63,9 @@ type AddItemParam struct {
 }
 
 type ContestService interface {
-	CreateContest(ctx context.Context, p CreateContestParam) (Contest, error)
-	AddItem(ctx context.Context, p AddItemParam) (Item, error)
-	GetContest(ctx context.Context, id string) (Contest, error)
+	CreateContest(ctx context.Context, p CreateContestParam) (*Contest, error)
+	AddItem(ctx context.Context, p AddItemParam) (*Item, error)
+	GetContest(ctx context.Context, id string) (*Contest, error)
 	RecordVote(ctx context.Context, p RecordVoteParam) error
-	GetMatchUp(ctx context.Context, contestID string) ([]Item, error)
+	GetMatchUp(ctx context.Context, contestID string) ([]*Item, error)
 }
