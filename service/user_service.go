@@ -9,7 +9,6 @@ import (
 	"rankit/postgres/sqlgen"
 	"rankit/rankit"
 
-	"github.com/jackc/pgx/v5"
 	"github.com/segmentio/ksuid"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -98,7 +97,7 @@ func (s *UserService) Authenticate(ctx context.Context, p rankit.AuthenticateUse
 	}
 
 	user, err := s.querier.GetUserByEmail(ctx, p.Email)
-	if err == pgx.ErrNoRows {
+	if postgres.IsNotFound(err) {
 		return nil, ErrInvalidLoginDetails
 	}
 	if err != nil {

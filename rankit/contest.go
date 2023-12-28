@@ -10,11 +10,11 @@ type Contest struct {
 	ID          string      `json:"id"`
 	CreatorID   string      `json:"creator_id"`
 	Title       string      `json:"title"`
-	Description *string     `json:"description"`
+	Description string      `json:"description"`
 	ContentType ContentType `json:"content_type"`
 	CreatedAt   time.Time   `json:"created_at"`
 	UpdatedAt   time.Time   `json:"updated_at"`
-	Items       []Item      `json:"items"`
+	Items       []*Item     `json:"items"`
 }
 
 type Item struct {
@@ -50,9 +50,9 @@ type RecordVoteParam struct {
 }
 
 type CreateContestParam struct {
-	CreatorID   string  `json:"creator_id"`
-	Title       string  `json:"title"`
-	Description *string `json:"description"`
+	CreatorID   string `json:"creator_id"`
+	Title       string `json:"title"`
+	Description string `json:"description"`
 }
 
 type AddItemParam struct {
