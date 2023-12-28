@@ -152,7 +152,7 @@ func (cs *ContestService) GetMatchUp(ctx context.Context, contestID string) ([]*
 		return nil, fmt.Errorf("failed to get random items: %w", err)
 	}
 
-	return nil, nil
+	return Map(items, toRankitItem), nil
 }
 
 func toRankitContest(c *sqlgen.Contest) *rankit.Contest {
