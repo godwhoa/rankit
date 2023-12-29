@@ -2,6 +2,7 @@ package http
 
 import (
 	"net/http"
+
 	"rankit/errors"
 
 	"github.com/alexedwards/scs/v2"

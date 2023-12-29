@@ -9,6 +9,7 @@ import (
 	"rankit/postgres/sqlgen"
 	"rankit/rankit"
 
+	"github.com/alexedwards/argon2id"
 	"github.com/segmentio/ksuid"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -18,8 +19,6 @@ var (
 	ErrEmailAlreadyExists  = errors.E(errors.Invalid, "email already exists")
 	ErrUserNotFound        = errors.E(errors.NotFound, "user not found")
 )
-
-const BCRYPT_COST = bcrypt.DefaultCost + 4
 
 type UserService struct {
 	querier sqlgen.Querier
@@ -57,7 +56,7 @@ func (s *UserService) CreateUser(ctx context.Context, p rankit.CreateUserParam) 
 		return nil, errors.E(errors.Invalid, "validation failed", err)
 	}
 
-	hash, err := bcrypt.GenerateFromPassword([]byte(p.Password), BCRYPT_COST)
+	hash, err := argon2id.CreateHash(p.Password, argon2id.DefaultParams)
 	if err != nil {
 		return nil, fmt.Errorf("failed to hash password: %w", err)
 	}
@@ -66,7 +65,7 @@ func (s *UserService) CreateUser(ctx context.Context, p rankit.CreateUserParam) 
 		ID:           generateUserID(),
 		Email:        p.Email,
 		DisplayName:  p.DisplayName,
-		PasswordHash: string(hash),
+		PasswordHash: hash,
 	})
 	if _, ok := postgres.IsUniqueViolation(err); ok {
 		return nil, ErrEmailAlreadyExists
@@ -106,6 +105,13 @@ func (s *UserService) Authenticate(ctx context.Context, p rankit.AuthenticateUse
 
 	isValid := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(p.Password)) == nil
 	if !isValid {
+		return nil, ErrInvalidLoginDetails
+	}
+	match, err := argon2id.ComparePasswordAndHash(p.Password, user.PasswordHash)
+	if err != nil {
+		return nil, fmt.Errorf("failed to compare password and hash: %w", err)
+	}
+	if !match {
 		return nil, ErrInvalidLoginDetails
 	}
 
