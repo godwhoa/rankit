@@ -110,6 +110,8 @@ func RespondError(w http.ResponseWriter, err *errors.Error) {
 		RespondMessage(w, http.StatusBadRequest, err.Message)
 	case errors.Unauthorized:
 		RespondMessage(w, http.StatusUnauthorized, err.Message)
+	case errors.Forbidden:
+		RespondMessage(w, http.StatusForbidden, err.Message)
 	default:
 		RespondMessage(w, http.StatusInternalServerError, err.Message)
 	}

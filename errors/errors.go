@@ -41,6 +41,7 @@ const (
 	Invalid                  // Invalid input, validation error etc
 	NotFound                 // Entity does not exist
 	Unauthorized             // Unauthorized access
+	Forbidden                // Forbidden access
 )
 
 func (k Kind) String() string {

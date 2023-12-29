@@ -26,6 +26,10 @@ INSERT INTO contests (
 -- name: GetContestByID :one
 SELECT * FROM contests WHERE id = $1;
 
+-- Get creator id of a contest
+-- name: GetContestCreatorID :one
+SELECT creator_id FROM contests WHERE id = $1;
+
 -- Create a new item
 -- name: CreateItem :one
 INSERT INTO items (

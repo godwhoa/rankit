@@ -42,6 +42,14 @@ func (cs *ContestService) CreateContest(ctx context.Context, p rankit.CreateCont
 }
 
 func (cs *ContestService) AddItem(ctx context.Context, p rankit.AddItemParam) (*rankit.Item, error) {
+	creatorID, err := cs.querier.GetContestCreatorID(ctx, p.ContestID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get contest creator id: %w", err)
+	}
+	if creatorID != p.CreatorID {
+		return nil, errors.E(errors.Forbidden, "only the creator of the contest can add items")
+	}
+
 	item, err := cs.querier.CreateItem(ctx, sqlgen.CreateItemParams{
 		ID:          generateItemID(),
 		ContestID:   p.ContestID,

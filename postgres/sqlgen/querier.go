@@ -17,6 +17,8 @@ type Querier interface {
 	CreateUser(ctx context.Context, arg CreateUserParams) (*User, error)
 	// Find contest by ID
 	GetContestByID(ctx context.Context, id string) (*Contest, error)
+	// Get creator id of a contest
+	GetContestCreatorID(ctx context.Context, id string) (string, error)
 	// Get item ELO rating history
 	GetItemEloHistory(ctx context.Context, itemID string) ([]*EloHistory, error)
 	// Get an item's current ELO rating

@@ -139,6 +139,18 @@ func (q *Queries) GetContestByID(ctx context.Context, id string) (*Contest, erro
 	return &i, err
 }
 
+const getContestCreatorID = `-- name: GetContestCreatorID :one
+SELECT creator_id FROM contests WHERE id = $1
+`
+
+// Get creator id of a contest
+func (q *Queries) GetContestCreatorID(ctx context.Context, id string) (string, error) {
+	row := q.db.QueryRow(ctx, getContestCreatorID, id)
+	var creator_id string
+	err := row.Scan(&creator_id)
+	return creator_id, err
+}
+
 const getItemEloHistory = `-- name: GetItemEloHistory :many
 SELECT id, item_id, elo_rating, created_at FROM elo_history WHERE item_id = $1 ORDER BY created_at DESC
 `
