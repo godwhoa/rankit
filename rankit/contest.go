@@ -62,10 +62,16 @@ type AddItemParam struct {
 	CreatorID   string          `json:"creator_id"`
 }
 
+type EloHistory struct {
+	Elo       int       `json:"elo"`
+	Timestamp time.Time `json:"ts"`
+}
+
 type ContestService interface {
 	CreateContest(ctx context.Context, p CreateContestParam) (*Contest, error)
 	AddItem(ctx context.Context, p AddItemParam) (*Item, error)
 	GetContest(ctx context.Context, id string) (*Contest, error)
 	RecordVote(ctx context.Context, p RecordVoteParam) error
 	GetMatchUp(ctx context.Context, contestID string) ([]*Item, error)
+	GetItemEloHistory(ctx context.Context, itemID string) ([]*EloHistory, error)
 }

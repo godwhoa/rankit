@@ -163,6 +163,22 @@ func (cs *ContestService) GetMatchUp(ctx context.Context, contestID string) ([]*
 	return Map(items, toRankitItem), nil
 }
 
+func (cs *ContestService) GetItemEloHistory(ctx context.Context, itemID string) ([]*rankit.EloHistory, error) {
+	history, err := cs.querier.GetItemEloHistory(ctx, itemID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get item elo history: %w", err)
+	}
+
+	return Map(history, toRankitEloHistory), nil
+}
+
+func toRankitEloHistory(h *sqlgen.EloHistory) *rankit.EloHistory {
+	return &rankit.EloHistory{
+		Elo:       h.EloRating,
+		Timestamp: h.CreatedAt,
+	}
+}
+
 func toRankitContest(c *sqlgen.Contest) *rankit.Contest {
 	return &rankit.Contest{
 		ID:          c.ID,
