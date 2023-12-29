@@ -50,11 +50,12 @@ func (s *Server) Listen(addr string) error {
 	})
 	r.Route("/v1/contests", func(r chi.Router) {
 		r.Use(Auth(s.sessionmgr))
-		// r.Post("/", s.toHTTPHandlerFunc(s.CreateContest))
-		// r.Post("/{contest_id}/items", s.toHTTPHandlerFunc(s.AddItem))
-		// r.Post("/{contest_id}/vote", s.toHTTPHandlerFunc(s.RecordVote))
-		// r.Get("/{contest_id}", s.toHTTPHandlerFunc(s.GetContest))
-		// r.Get("/{contest_id}/items", s.toHTTPHandlerFunc(s.ListItems))
+		r.Post("/", s.toHTTPHandlerFunc(s.CreateContest))
+		r.Post("/{contest_id}/items", s.toHTTPHandlerFunc(s.AddItem))
+		r.Get("/{contest_id}", s.toHTTPHandlerFunc(s.GetContest))
+		r.Get("/{contest_id}/matchup", s.toHTTPHandlerFunc(s.GetMatchUp))
+		r.Post("/{contest_id}/vote", s.toHTTPHandlerFunc(s.RecordVote))
+		r.Get("/{contest_id}/items/{item_id}/history", s.toHTTPHandlerFunc(s.GetItemEloHistory))
 	})
 
 	return http.ListenAndServe(addr, s.sessionmgr.LoadAndSave(r))
