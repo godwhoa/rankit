@@ -15,13 +15,13 @@ import (
 )
 
 type ContestService struct {
-	querier postgres.Querier
+	querier postgres.TxnQuerier
 	db      *pgxpool.Pool
 }
 
 var _ rankit.ContestService = (*ContestService)(nil)
 
-func NewContestService(querier postgres.Querier) *ContestService {
+func NewContestService(querier postgres.TxnQuerier) *ContestService {
 	return &ContestService{
 		querier: querier,
 	}
