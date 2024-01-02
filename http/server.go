@@ -45,6 +45,7 @@ func (s *Server) Listen(addr string) error {
 	}))
 	r.Route("/v1/users", func(r chi.Router) {
 		r.Post("/", s.toHTTPHandlerFunc(s.CreateUser))
+		r.Get("/me", s.toHTTPHandlerFunc(s.GetUser))
 		r.Post("/login", s.toHTTPHandlerFunc(s.AuthenticateUser))
 		r.Post("/logout", s.toHTTPHandlerFunc(s.Logout))
 	})

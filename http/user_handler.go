@@ -38,6 +38,20 @@ func (s *Server) AuthenticateUser(w http.ResponseWriter, r *http.Request) (respo
 	return
 }
 
+func (s *Server) GetUser(w http.ResponseWriter, r *http.Request) (response any, status int, err error) {
+	userID := s.sessionmgr.GetString(r.Context(), USER_ID_SESSION_KEY)
+	if userID == "" {
+		return nil, http.StatusUnauthorized, errors.E(errors.Unauthorized, "unauthorized")
+	}
+
+	user, err := s.usersvc.GetUser(r.Context(), userID)
+	if err == nil {
+		return user, http.StatusOK, nil
+	}
+
+	return
+}
+
 func (s *Server) Logout(w http.ResponseWriter, r *http.Request) (response any, status int, err error) {
 	s.sessionmgr.Remove(r.Context(), USER_ID_SESSION_KEY)
 	RespondMessage(w, http.StatusOK, "logged out")

@@ -11,7 +11,6 @@ import (
 
 	"github.com/alexedwards/argon2id"
 	"github.com/segmentio/ksuid"
-	"golang.org/x/crypto/bcrypt"
 )
 
 var (
@@ -103,10 +102,6 @@ func (s *UserService) Authenticate(ctx context.Context, p rankit.AuthenticateUse
 		return nil, fmt.Errorf("failed to get user by email: %w", err)
 	}
 
-	isValid := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(p.Password)) == nil
-	if !isValid {
-		return nil, ErrInvalidLoginDetails
-	}
 	match, err := argon2id.ComparePasswordAndHash(p.Password, user.PasswordHash)
 	if err != nil {
 		return nil, fmt.Errorf("failed to compare password and hash: %w", err)
